@@ -84,7 +84,7 @@ void addClientsToVector(vector<sClient>& myClients) {
         cout << "Do you want to add another Client ? Yes[1] / No[0] : ";
         cin >> addNew;
 
-    } while (addNew == 1);    
+    } while (addNew == 1);
 }
 
 string recordToLine(sClient Client, string spar = "##//##") {
@@ -151,7 +151,7 @@ void PrintAllClientsData(vector <sClient>& myClients)
 }
 
 
-void AddClientLineToFile(string ClientLine, const string &filename) {
+void AddClientLineToFile(string ClientLine, const string& filename) {
     fstream myFile;
     myFile.open(filename, ios::out | ios::app);
     if (myFile.is_open()) {
@@ -183,7 +183,7 @@ vector<sClient> loadDataFromFile(const string& filename) {
 }
 
 void AddClients(vector<sClient>& myClients) {
-    bool addMore = 0;
+    int addMore = 0;
     cout << "\n-----------------------------------------------------\n";
     cout << "\t\t Add New Clients Screen";
     cout << "\n-----------------------------------------------------\n\n";
@@ -193,13 +193,13 @@ void AddClients(vector<sClient>& myClients) {
         myClients = loadDataFromFile(filename);
         cout << "\nDo you want to add more clients ? Yes[1] / No[0] : ";
         cin >> addMore;
-        
+
     } while (addMore == 1);
 }
 
 int searchByAccNum(vector<sClient>& myClients, string AccountNum) {
     int len = myClients.size();
-    for (int i = 0; i < len ;i++) {
+    for (int i = 0; i < len; i++) {
         if (AccountNum == myClients[i].AccountNum) {
             return i;
             break;
@@ -238,7 +238,7 @@ void deleteClient(vector<sClient>& myClients) {
         cout << "\nAccount Number (" << AccountNum << ") Not Found\n";
     }
     else {
-        bool del = 0;
+        int del = 0;
         printClientInfo(myClients[Account]);
         cout << "Are you sure you want to delete this client? Yes[1] / No[0] : ";
         cin >> del;
@@ -247,7 +247,7 @@ void deleteClient(vector<sClient>& myClients) {
             saveClientsToFile(myClients, filename);
             cout << "\nClient Account Deleted Successfully\n";
 
-            
+
         }
     }
 }
@@ -256,7 +256,7 @@ void updateClient(vector<sClient>& myClients) {
     string AccountNum = inputInfo("Enter Account Num : ");
     int Account = searchByAccNum(myClients, AccountNum);
     if (Account == -1) {
-        cout << "\nAccount Number (" << AccountNum <<") Not Found\n";
+        cout << "\nAccount Number (" << AccountNum << ") Not Found\n";
     }
     else {
         printClientInfo(myClients[Account]);
@@ -269,7 +269,7 @@ void updateClient(vector<sClient>& myClients) {
         saveClientsToFile(myClients, filename);
     }
 
-    
+
 }
 
 int actionChoice() {
@@ -331,7 +331,7 @@ void menuScreen(vector <sClient>& myClients) {
     cout << "\n\t[6] Exit.\n";
     cout << "\n==========================================\n";
     excuteAcions(actionChoice(), myClients);
-    
+
 }
 
 void BackToMainMenu(vector <sClient>& myClients) {
