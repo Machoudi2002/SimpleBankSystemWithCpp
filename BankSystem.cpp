@@ -75,18 +75,6 @@ sClient fillClientInfo(vector <sClient>& myClients) {
     return newClient;
 }
 
-void addClientsToVector(vector<sClient>& myClients) {
-    sClient newClient;
-    bool addNew = 0;
-    do {
-        newClient = fillClientInfo(myClients);
-        myClients.push_back(newClient);
-        cout << "Do you want to add another Client ? Yes[1] / No[0] : ";
-        cin >> addNew;
-
-    } while (addNew == 1);
-}
-
 string recordToLine(sClient Client, string spar = "##//##") {
     string infoLine = "";
     infoLine = Client.AccountNum + spar + Client.PinCode + spar + Client.Name + spar + Client.PhoneNum + spar + to_string(Client.AccountBalance);
