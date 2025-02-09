@@ -190,7 +190,7 @@ void AddClients(vector<sClient>& myClients) {
     cout << "Adding New Clients : \n\n";
     do {
         AddNewClient(myClients);
-        myClients = loadDataFromFile("BankClients.txt");
+        myClients = loadDataFromFile(filename);
         cout << "\nDo you want to add more clients ? Yes[1] / No[0] : ";
         cin >> addMore;
         
@@ -220,6 +220,17 @@ void findClient(vector<sClient>& myClients) {
     }
 }
 
+void saveClientsToFile(vector<sClient>& myClients, const string& filename) {
+    ofstream myFile(filename, ios::out);
+    if (myFile.is_open()) {
+        for (sClient& client : myClients) {
+            myFile << recordToLine(client) << endl;
+        }
+        myFile.close();
+    }
+}
+
+
 void deleteClient(vector<sClient>& myClients) {
     string AccountNum = inputInfo("Enter Account Num : ");
     int Account = searchByAccNum(myClients, AccountNum);
@@ -233,9 +244,10 @@ void deleteClient(vector<sClient>& myClients) {
         cin >> del;
         if (del == 1) {
             myClients.erase(myClients.begin() + Account);
+            saveClientsToFile(myClients, filename);
             cout << "\nClient Account Deleted Successfully\n";
 
-            myClients = loadDataFromFile(filename);
+            
         }
     }
 }
@@ -254,7 +266,7 @@ void updateClient(vector<sClient>& myClients) {
         myClients[Account].AccountBalance = stoi(inputInfo("Enter Account Balance : "));
 
         cout << "\nClient Account Updated Successfully\n";
-        myClients = loadDataFromFile(filename);
+        saveClientsToFile(myClients, filename);
     }
 
     
@@ -323,6 +335,7 @@ void menuScreen(vector <sClient>& myClients) {
 }
 
 void BackToMainMenu(vector <sClient>& myClients) {
+    cout << "\n\n";
     system("pause");
     system("cls");
     menuScreen(myClients);
