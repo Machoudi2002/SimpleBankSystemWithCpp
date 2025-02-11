@@ -13,7 +13,16 @@ enum Actions {
     DELETE = 3,
     UPDATE = 4,
     FIND = 5,
-    EXIT = 6
+    TRANSACTION = 6,
+    EXIT = 7,
+
+};
+
+enum Transaction {
+    DIPOSIT = 1,
+    WITHDRAW = 2,
+    TOTAL_BALANCE = 3,
+    MAIN_MENU = 4
 };
 
 vector<string> splitString(string text, string spar) {
@@ -114,6 +123,7 @@ void PrintClientRecord(sClient Client)
     cout << "| " << setw(12) << left << Client.PhoneNum;
     cout << "| " << setw(12) << left << Client.AccountBalance;
 }
+
 void PrintAllClientsData(vector <sClient>& myClients)
 {
     cout << "\n\t\t\t\t\tClient List (" << myClients.size() << ") Client(s).";
@@ -260,12 +270,12 @@ void updateClient(vector<sClient>& myClients) {
 
 }
 
-int actionChoice() {
-    int choice;
-    cout << "Choose What Do you want To do ? [1 to 6] : ";
+short actionChoice(short from, short to) {
+    short choice;
+    cout << "Choose What Do you want To do ? [" << from << " to " << to << "] : ";
     cin >> choice;
-    while (choice > 6 or choice < 1) {
-        cout << "Invalid Input, Enter A number between 1 and 6 : ";
+    while (choice > 7 or choice < 1) {
+        cout << "Invalid Input, Enter A number between" << from << " to " << to << " : ";
         cin >> choice;
     }
 
@@ -273,8 +283,40 @@ int actionChoice() {
 }
 
 void BackToMainMenu(vector <sClient>& myClients);
+void BackToTransMenu(vector <sClient>& myClients);
+void transactionMenu(vector <sClient>& myClients);
 
-void excuteAcions(int choice, vector <sClient>& myClients) {
+void dipositAction(vector <sClient>& myClients) {
+    string AccountNum = inputInfo("Enter Account Num : ");
+    int Account = searchByAccNum(myClients, AccountNum);
+    if (Account == -1) {
+        cout << "\nAccount Number (" << AccountNum << ") Not Found\n";
+    }
+    else {
+        printClientInfo(myClients[Account]);
+        int amount, continu;
+        cout << "Please enter diposit amount : ";
+        cin >> amount;
+        
+
+        cout << "Are you sure you want to perform this transaction ? Yes[1]/No[0] : ";
+        cin >> continu;
+        if (continu == 1) {
+            myClients[Account].AccountBalance += amount;
+            saveClientsToFile(myClients, filename);
+            cout << "\nClient Account Updated Successfully\n";
+            cout << "New Balance : " << myClients[Account].AccountBalance;
+            
+        }
+    }
+}
+
+void endScreen() {
+    cout << "\n=================== END SCREEN ====================\n";
+    cout << "\n========== THANK YOU FOR USING OUR BANK ===========\n\n\n";
+}
+
+void excuteMainAcions(int choice, vector <sClient>& myClients) {
     switch (choice)
     {
     case Actions::SHOW:
@@ -302,7 +344,14 @@ void excuteAcions(int choice, vector <sClient>& myClients) {
         findClient(myClients);
         BackToMainMenu(myClients);
         break;
+    case Actions::TRANSACTION:
+        system("cls");
+        transactionMenu(myClients);
+        BackToTransMenu(myClients);
+        break;
     case Actions::EXIT:
+        system("cls");
+        endScreen();
         break;
     }
 }
@@ -316,9 +365,106 @@ void menuScreen(vector <sClient>& myClients) {
     cout << "\n\t[3] Delete Client.";
     cout << "\n\t[4] Update Client Info.";
     cout << "\n\t[5] Find Client.";
-    cout << "\n\t[6] Exit.\n";
+    cout << "\n\t[6] Transaction.";
+    cout << "\n\t[7] Exit.\n";
     cout << "\n==========================================\n";
-    excuteAcions(actionChoice(), myClients);
+    excuteMainAcions(actionChoice(1 , 7), myClients);
+
+}
+
+void TotalBalance(vector <sClient>& myClients) {
+    int totalBalance = 0;
+    cout << "\n\t\t\t\t\tClient List (" << myClients.size() << ") Client(s).";
+    cout <<
+        "\n_______________________________________________________";
+    cout << "_________________________________________\n" << endl;
+    cout << "| " << left << setw(15) << "Accout Number";
+    cout << "| " << left << setw(40) << "Client Name";
+    cout << "| " << left << setw(12) << "Balance";
+    cout <<
+        "\n_______________________________________________________";
+    cout << "_________________________________________\n" << endl;
+    for (sClient Client : myClients)
+    {
+        cout << "| " << setw(15) << left << Client.AccountNum;
+        cout << "| " << setw(40) << left << Client.Name;
+        cout << "| " << setw(12) << left << Client.AccountBalance;
+        totalBalance = totalBalance + Client.AccountBalance;
+        cout << endl;
+    }
+    cout << "\n_______________________________________________________";
+    cout << "_________________________________________\n" << endl;
+    cout << "\t\t\t\tTotal Balances = " << totalBalance << endl;
+}
+
+void withdrawAction(vector <sClient>& myClients) {
+    string AccountNum = inputInfo("Enter Account Num : ");
+    int Account = searchByAccNum(myClients, AccountNum);
+    if (Account == -1) {
+        cout << "\nAccount Number (" << AccountNum << ") Not Found\n";
+    }
+    else {
+        printClientInfo(myClients[Account]);
+        int AccountBalance = myClients[Account].AccountBalance;
+        int amount, continu;
+        cout << "Please enter withdraw amount : ";
+        do {
+            
+            cin >> amount;
+            if (amount > AccountBalance) {
+                cout << "Amount Exceeds the balance you can withdraw up to " << AccountBalance << endl;
+                cout << "Please enter a valid withdraw amount : ";
+            }
+        } while (amount > AccountBalance);
+        
+        
+
+        cout << "Are you sure you want to perform this transaction ? Yes[1]/No[0] : ";
+        cin >> continu;
+        if (continu == 1) {
+            myClients[Account].AccountBalance -= amount;
+            saveClientsToFile(myClients, filename);
+            cout << "\nClient Account Updated Successfully\n";
+            cout << "New Balance : " << myClients[Account].AccountBalance;
+
+        }
+    }
+}
+
+void excuteTransAcions(int choice, vector <sClient>& myClients) {
+    switch (choice) {
+    case Transaction::DIPOSIT:
+        system("cls");
+        dipositAction(myClients);
+        BackToTransMenu(myClients);
+        break;
+    case Transaction::WITHDRAW:
+        system("cls");
+        withdrawAction(myClients);
+        BackToTransMenu(myClients);
+        break;
+    case Transaction::TOTAL_BALANCE:
+        system("cls");
+        TotalBalance(myClients);
+        BackToTransMenu(myClients);
+        break;
+    case Transaction::MAIN_MENU:
+        system("cls");
+        menuScreen(myClients);
+        break;
+    }
+}
+
+void transactionMenu(vector <sClient>& myClients) {
+    cout << "\n==========================================\n";
+    cout << "\t    Transaction Screen";
+    cout << "\n==========================================\n";
+    cout << "\n\t[1] Deposit.";
+    cout << "\n\t[2] Withdraw.";
+    cout << "\n\t[3] Total Balances.";
+    cout << "\n\t[4] Main Menu.";
+    cout << "\n\n==========================================\n";
+    excuteTransAcions(actionChoice(1, 4), myClients);
 
 }
 
@@ -327,6 +473,13 @@ void BackToMainMenu(vector <sClient>& myClients) {
     system("pause");
     system("cls");
     menuScreen(myClients);
+}
+
+void BackToTransMenu(vector <sClient>& myClients) {
+    cout << "\n\n";
+    system("pause");
+    system("cls");
+    transactionMenu(myClients);
 }
 
 
